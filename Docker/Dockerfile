@@ -8,6 +8,11 @@ ENV DOCKERVERSION=18.03.1-ce
 ## Installing wget command
 RUN yum install wget -y && yum clean all
 
+##Installing helm 
+RUN curl https://storage.googleapis.com/kubernetes-helm/helm-v2.14.0-linux-amd64.tar.gz > ./helm.tar.gz \
+    && tar -xvf ./helm.tar.gz \
+    && mv ./linux-amd64/*  /usr/local/bin
+
 ## Installing terraform
 RUN wget https://releases.hashicorp.com/terraform/0.11.14/terraform_0.11.14_linux_amd64.zip \
     && yum install unzip -y \
