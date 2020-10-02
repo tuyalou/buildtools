@@ -1,3 +1,4 @@
+def username = '' 
 def registry = "${username}/${repositoryName}"
 def repositoryName = "${JOB_NAME}"
 .split('/')[0]
