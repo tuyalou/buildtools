@@ -1,3 +1,42 @@
+def registry = "${username}/${repositoryName}"
+def repositoryName = "${JOB_NAME}"
+.split('/')[0]
+.replace('-fuchicorp', '')
+.replace('-build', '')
+.replace('-deploy', '')
+
+// Generating the deployment name example-deploy 
+def deployJobName = "${JOB_NAME}"
+.split('/')[0]
+.replace('-build', '-deploy')
+
+def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '')
+if (branch =~ '^v[0-9].[0-9]' || branch =~ '^v[0-9][0-9].[0-9]' ) {
+        // if Application release or branch starts with v* example v0.1 will be deployed to prod
+        environment = 'prod' 
+        repositoryName = repositoryName + '-prod'
+
+  } else if (branch.contains('dev-feature')) {
+        // if branch name contains dev-feature then the deploy will be deployed to dev environment 
+        environment = 'dev' 
+        repositoryName = repositoryName + '-dev-feature'
+
+  } else if (branch.contains('qa-feature')) {
+        // if branch name contains q-feature then the deploy will be deployed to qa environment
+        repositoryName = repositoryName + '-qa-feature'
+        environment = 'qa' 
+
+  } else if (branch.contains('PR')) {
+        // PR means Pull requests all PR will be deployed to test namespace 
+        repositoryName = repositoryName + '-pr-feature'
+        environment = 'test' 
+
+  } else if (branch == 'master') {
+        // If branch is master it will be deployed to stage environment 
+        environment = 'stage' 
+        repositoryName = repositoryName + '-stage'
+  }
+
 def k8slabel = "jenkins-pipeline-${UUID.randomUUID().toString()}"
 def slavePodTemplate = """
       metadata:
@@ -39,12 +78,13 @@ def slavePodTemplate = """
     podTemplate(name: k8slabel, label: k8slabel, yaml: slavePodTemplate, showRawYaml: false) {
       node(k8slabel) {
         stage('Pull SCM') {
-            git 'https://github.com/tuyalou/buildtools.git'
+            checkout scm
+            gitCommitHash = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
         }
         dir('Docker/') {
           stage("Docker Build") {
               container("docker") {
-                  sh "docker build -t tuyalou/buildtools ."
+                  dockerImage = docker.build(repositoryName, "--build-arg environment=${environment.toLowerCase()} .")
               }
           }
           stage("Docker Login") {
@@ -56,7 +96,7 @@ def slavePodTemplate = """
           }
           stage("Docker Push") {
               container("docker") {
-                  sh "docker push tuyalou/buildtools"
+                  docker.withRegistry("${username}", 'docker-hub-creds') {
               }
           }
         }
