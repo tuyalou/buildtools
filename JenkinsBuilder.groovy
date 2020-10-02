@@ -1,4 +1,15 @@
 def username = '' 
+def repositoryName = "${JOB_NAME}"
+.split('/')[0]
+.replace('-fuchicorp', '')
+.replace('-build', '')
+.replace('-deploy', '')
+
+// Generating the deployment name example-deploy 
+def deployJobName = "${JOB_NAME}"
+.split('/')[0]
+.replace('-build', '-deploy')
+
 def registry = "${username}/${repositoryName}"
 def repositoryName = "${JOB_NAME}"
 .split('/')[0]
@@ -39,68 +50,87 @@ if (branch =~ '^v[0-9].[0-9]' || branch =~ '^v[0-9][0-9].[0-9]' ) {
   }
 
 def k8slabel = "jenkins-pipeline-${UUID.randomUUID().toString()}"
-def slavePodTemplate = """
-      metadata:
-        labels:
-          k8s-label: ${k8slabel}
-        annotations:
-          jenkinsjoblabel: ${env.JOB_NAME}-${env.BUILD_NUMBER}
-      spec:
-        affinity:
-          podAntiAffinity:
-            requiredDuringSchedulingIgnoredDuringExecution:
-            - labelSelector:
-                matchExpressions:
-                - key: component
-                  operator: In
-                  values:
-                  - jenkins-jenkins-master
-              topologyKey: "kubernetes.io/hostname"
-        containers:
-        - name: docker
-          image: docker:latest
-          imagePullPolicy: IfNotPresent
-          command:
-          - cat
-          tty: true
-          volumeMounts:
-            - mountPath: /var/run/docker.sock
-              name: docker-sock
-        serviceAccountName: default
-        securityContext:
-          runAsUser: 0
-          fsGroup: 0
-        volumes:
-          - name: docker-sock
-            hostPath:
-              path: /var/run/docker.sock
-    """
+  try {
+    properties([
+      parameters([
+        booleanParam(defaultValue: false,
+          description: 'Click this if you would like to deploy to latest',
+          name: 'PUSH_LATEST'
+          )])])
 
-    podTemplate(name: k8slabel, label: k8slabel, yaml: slavePodTemplate, showRawYaml: false) {
-      node(k8slabel) {
-        stage('Pull SCM') {
-            checkout scm
-            gitCommitHash = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
-        }
-        dir('Docker/') {
-          stage("Docker Build") {
-              container("docker") {
-                  dockerImage = docker.build(repositoryName, "--build-arg environment=${environment.toLowerCase()} .")
-              }
-          }
-          stage("Docker Login") {
-              withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', passwordVariable: 'password', usernameVariable: 'username')]) {
-                  container("docker") {
-                      sh "docker login --username ${username} --password ${password}"
-                  }
-              }
-          }
-          stage("Docker Push") {
-              container("docker") {
-                  docker.withRegistry("${username}", 'docker-hub-creds') {
-              }
-          }
-        }
+      if (triggerUser != "AutoTrigger") {
+        // If job is not trriggered from github or automatically it will check for validation 
+        commonFunctions.validateDeployment(triggerUser, environment)
+      } else {
+        println("The job is triggereted automatically and skiping the validation !!!")
       }
-    }
-   }
+        def slavePodTemplate = """
+              metadata:
+                labels:
+                  k8s-label: ${k8slabel}
+                annotations:
+                  jenkinsjoblabel: ${env.JOB_NAME}-${env.BUILD_NUMBER}
+              spec:
+                affinity:
+                  podAntiAffinity:
+                    requiredDuringSchedulingIgnoredDuringExecution:
+                    - labelSelector:
+                        matchExpressions:
+                        - key: component
+                          operator: In
+                          values:
+                          - jenkins-jenkins-master
+                      topologyKey: "kubernetes.io/hostname"
+                containers:
+                - name: docker
+                  image: docker:latest
+                  imagePullPolicy: IfNotPresent
+                  command:
+                  - cat
+                  tty: true
+                  volumeMounts:
+                    - mountPath: /var/run/docker.sock
+                      name: docker-sock
+                serviceAccountName: default
+                securityContext:
+                  runAsUser: 0
+                  fsGroup: 0
+                volumes:
+                  - name: docker-sock
+                    hostPath:
+                      path: /var/run/docker.sock
+            """
+
+            podTemplate(name: k8slabel, label: k8slabel, yaml: slavePodTemplate, showRawYaml: false) {
+              node(k8slabel) {
+                stage('Pull SCM') {
+                    checkout scm
+                    gitCommitHash = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
+                }
+                dir('Docker/') {
+                  stage("Docker Build") {
+                      container("docker") {
+                          dockerImage = docker.build(repositoryName, "--build-arg environment=${environment.toLowerCase()} .")
+                      }
+                  }
+                  stage("Docker Login") {
+                      withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', passwordVariable: 'password', usernameVariable: 'username')]) {
+                          container("docker") {
+                              sh "docker login --username ${username} --password ${password}"
+                          }
+                      }
+                  }
+                  stage("Docker Push") {
+                      container("docker") {
+                          docker.withRegistry("${username}", 'docker-hub-creds') {
+                                  dockerImage.push("${gitCommitHash}")
+                                  if (params.PUSH_LATEST) {
+                                          dockerImage.push("latest")
+                                  }
+                      }
+                  }
+                }
+              }
+            }
+           }
+  }
