@@ -12,7 +12,7 @@ def deployJobName = "${JOB_NAME}"
 
 def triggerUser = commonFunctions.getBuildUser()
 def environment = ""
-def gitCommitHash = "
+def gitCommitHash = ""
 
 def registry = "${username}/${repositoryName}"
 def repositoryName = "${JOB_NAME}"
