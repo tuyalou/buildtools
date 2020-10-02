@@ -10,6 +10,10 @@ def deployJobName = "${JOB_NAME}"
 .split('/')[0]
 .replace('-build', '-deploy')
 
+def triggerUser = commonFunctions.getBuildUser()
+def environment = ""
+def gitCommitHash = "
+
 def registry = "${username}/${repositoryName}"
 def repositoryName = "${JOB_NAME}"
 .split('/')[0]
