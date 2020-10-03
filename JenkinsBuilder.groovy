@@ -1,23 +1,26 @@
-def username = '' 
-def repositoryName = "${JOB_NAME}"
-.split('/')[0]
-.replace('-fuchicorp', '')
-.replace('-build', '')
-.replace('-deploy', '')
+def runPipeline() {
+  def commonFunctions = new CommonFunction()
+  def triggerUser = commonFunctions.getBuildUser()
+  def username = '' 
+  def repositoryName = "${JOB_NAME}"
+  .split('/')[0]
+  .replace('-fuchicorp', '')
+  .replace('-build', '')
+  .replace('-deploy', '')
 
 // Generating the deployment name example-deploy 
-def deployJobName = "${JOB_NAME}"
-.split('/')[0]
-.replace('-build', '-deploy')
+  def deployJobName = "${JOB_NAME}"
+  .split('/')[0]
+  .replace('-build', '-deploy')
+ 
+  def triggerUser = commonFunctions.getBuildUser()
+  def environment = ""
+  def gitCommitHash = ""
 
-def triggerUser = commonFunctions.getBuildUser()
-def environment = ""
-def gitCommitHash = ""
+  def registry = "${username}/${repositoryName}"
 
-def registry = "${username}/${repositoryName}"
-
-def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '')
-if (branch =~ '^v[0-9].[0-9]' || branch =~ '^v[0-9][0-9].[0-9]' ) {
+  def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '')
+  if (branch =~ '^v[0-9].[0-9]' || branch =~ '^v[0-9][0-9].[0-9]' ) {
         // if Application release or branch starts with v* example v0.1 will be deployed to prod
         environment = 'prod' 
         repositoryName = repositoryName + '-prod'
@@ -125,3 +128,4 @@ def slavePodTemplate = """
       }
     }
    }
+        
