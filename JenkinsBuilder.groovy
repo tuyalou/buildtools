@@ -50,12 +50,6 @@ properties([
         )])
 ])
 
-if (triggerUser != "AutoTrigger") {
-        // If job is not trriggered from github or automatically it will check for validation 
-       commonFunctions.validateDeployment(triggerUser, environment)
-} else {
-        println("The job is triggereted automatically and skiping the validation !!!")
-}
 def slavePodTemplate = """
       metadata:
         labels:
