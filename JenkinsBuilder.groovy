@@ -15,16 +15,6 @@ def environment = ""
 def gitCommitHash = ""
 
 def registry = "${username}/${repositoryName}"
-def repositoryName = "${JOB_NAME}"
-.split('/')[0]
-.replace('-fuchicorp', '')
-.replace('-build', '')
-.replace('-deploy', '')
-
-// Generating the deployment name example-deploy 
-def deployJobName = "${JOB_NAME}"
-.split('/')[0]
-.replace('-build', '-deploy')
 
 def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '')
 if (branch =~ '^v[0-9].[0-9]' || branch =~ '^v[0-9][0-9].[0-9]' ) {
