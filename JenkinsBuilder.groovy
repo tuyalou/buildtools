@@ -4,11 +4,6 @@
   .replace('-fuchicorp', '')
   .replace('-build', '')
   .replace('-deploy', '')
-
-// Generating the deployment name example-deploy 
-  def deployJobName = "${JOB_NAME}"
-  .split('/')[0]
-  .replace('-build', '-deploy')
  
   def environment = ""
   def gitCommitHash = ""
@@ -43,12 +38,6 @@
   }
 
 def k8slabel = "jenkins-pipeline-${UUID.randomUUID().toString()}"
-properties([
-        parameters([
-                booleanParam(defaultValue: false,description: 'Click this if you would like to deploy to latest',name: 'PUSH_LATEST'
-        )])
-])
-
 def slavePodTemplate = """
       metadata:
         labels:
@@ -86,6 +75,12 @@ def slavePodTemplate = """
               path: /var/run/docker.sock
     """
 
+  properties([
+          parameters([
+                  booleanParam(defaultValue: false,description: 'Click this if you would like to deploy to latest',name: 'PUSH_LATEST'
+          )])
+  ])
+
     podTemplate(name: k8slabel, label: k8slabel, yaml: slavePodTemplate, showRawYaml: false) {
       node(k8slabel) {
         stage('Pull SCM') {
@@ -99,7 +94,7 @@ def slavePodTemplate = """
               }
           }
           stage("Docker Login") {
-              withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', passwordVariable: 'password', usernameVariable: 'username')]) {
+              withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: "docker-hub-creds", passwordVariable: 'password', usernameVariable: 'username')]) {
                   container("docker") {
                       sh "docker login -u ${username} -p ${password}"
                   }
