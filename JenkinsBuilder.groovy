@@ -10,7 +10,6 @@
   .split('/')[0]
   .replace('-build', '-deploy')
  
-  def triggerUser = commonFunctions.getBuildUser()
   def environment = ""
   def gitCommitHash = ""
 
