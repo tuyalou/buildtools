@@ -1,6 +1,3 @@
-def runPipeline() {
-  def commonFunctions = new CommonFunction()
-  def triggerUser = commonFunctions.getBuildUser()
   def username = '' 
   def repositoryName = "${JOB_NAME}"
   .split('/')[0]
@@ -128,5 +125,3 @@ def slavePodTemplate = """
       }
     }
    }
-}
-        
