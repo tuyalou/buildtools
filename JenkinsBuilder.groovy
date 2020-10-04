@@ -77,7 +77,7 @@ def slavePodTemplate = """
           }
           stage("Docker Push") {
               container("docker") {
-                docker.withRegistry( '', registryCredential ) {
+                docker.withRegistry( '', registryCredentials ) {
                   dockerImage.push("${gitCommitHash}")
                   if (params.PUSH_LATEST) {
                     dockerImage.push("latest")
