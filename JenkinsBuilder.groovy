@@ -3,7 +3,7 @@
   def gitCommitHash = ""
   def dockerImage = ""
   def repositoryName = "${JOB_NAME}"
-  def registry = "${username}/${repositoryName}"
+  def registry = "tuyalou/${repositoryName}"
   def registryCredentials = 'docker-hub-creds'
 
   def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '')
