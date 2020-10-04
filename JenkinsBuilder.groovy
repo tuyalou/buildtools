@@ -65,7 +65,7 @@ def slavePodTemplate = """
         dir('Docker/') {
           stage("Docker Build") {
               container("docker") {
-                  dockerImage = docker.build(${env.username},repositoryName)
+                  dockerImage = docker.build(registry)
               }
           }
           stage("Docker Login") {
