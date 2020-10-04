@@ -2,7 +2,7 @@
   def repositoryName = "${JOB_NAME}"
   def environment = ""
   def gitCommitHash = ""
-  def registry = "${env.username}/${repositoryName}"
+  def registry = "${username}/${repositoryName}"
   def registryCredentials = 'docker-hub-creds'
 
   def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '')
