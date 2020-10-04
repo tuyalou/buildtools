@@ -4,12 +4,6 @@ def gitCommitHash = ""
 def dockerImage = ""
 def repositoryName = "${JOB_NAME}"
 
-def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '')
-if (branch =~ '^v[0-9].[0-9]' || branch =~ '^v[0-9][0-9].[0-9]' ) {
-      // if Application release or branch starts with v* example v0.1 will be deployed to prod
-      environment = 'prod' 
-      repositoryName = repositoryName + ':${branch}'
-}
 
 def registry = "tuyalou/${repositoryName}"
 def registryCredentials = 'docker-hub-creds'
