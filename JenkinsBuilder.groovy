@@ -90,7 +90,7 @@ def slavePodTemplate = """
           stage("Docker Login") {
             container("docker") {
               withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: "docker-hub-creds", usernameVariable: 'username', passwordVariable: 'password']]) {
-                docker login --username ${env.username} --password ${env.password}
+                sh "docker login --username ${env.username} --password ${env.password}"
                   }
               }
           }
