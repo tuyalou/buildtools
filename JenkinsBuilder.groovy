@@ -88,15 +88,15 @@ def slavePodTemplate = """
               }
           }
           stage("Docker Login") {
-              withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: "docker-hub-creds", passwordVariable: 'password', usernameVariable: 'username']]) {
+              withCredentials([string(credentialsId: 'dockerhub-token', variable: 'username')]) {
                   container("docker") {
-                      sh "docker login -u ${username} -p ${password}"
+                      sh "docker login --username ${username}"
                   }
               }
           }
           stage("Docker Push") {
               container("docker") {
-                  docker.withRegistry('', 'docker-hub-creds') {
+                  docker.withRegistry('', 'dockerhub-token') {
                           dockerImage.push("${gitCommitHash}")
                           if (params.PUSH_LATEST) {
                                   dockerImage.push("latest")
