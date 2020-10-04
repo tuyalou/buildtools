@@ -2,7 +2,7 @@
   def repositoryName = "${JOB_NAME}"
   def environment = ""
   def gitCommitHash = ""
-  def registry = "${username}/${repositoryName}"
+  def registry = ""
 
   def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '')
   if (branch =~ '^v[0-9].[0-9]' || branch =~ '^v[0-9][0-9].[0-9]' ) {
@@ -96,7 +96,7 @@ def slavePodTemplate = """
           }
           stage("Docker Push") {
               container("docker") {
-                  docker.withRegistry(registry, 'docker-hub-creds') {
+                  docker.withRegistry("${username}/${repositoryName}", 'docker-hub-creds') {
                           dockerImage.push("${gitCommitHash}")
                           if (params.PUSH_LATEST) {
                                   dockerImage.push("latest")
