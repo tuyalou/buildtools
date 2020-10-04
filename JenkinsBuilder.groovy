@@ -3,7 +3,6 @@
   def gitCommitHash = ""
   def dockerImage = ""
   def repositoryName = "${JOB_NAME}"
-  def imagename = "tuyalou/${repositoryName}"
   def registry = "${username}/${repositoryName}"
   def registryCredentials = 'docker-hub-creds'
 
@@ -68,7 +67,7 @@ def slavePodTemplate = """
           container("docker") {
             withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: "docker-hub-creds", usernameVariable: 'username', passwordVariable: 'password']]) {
               stage("Docker Build") {
-                dockerImage = docker.build imagename
+                dockerImage = docker.build registry
               }
 
               stage("Docker Login") {
