@@ -56,7 +56,7 @@ def slavePodTemplate = """
           parameters([
                   booleanParam(defaultValue: false,description: 'Click this if you would like to deploy to latest',name: 'PUSH_LATEST',
                   gitParameter(branch: '', branchFilter: 'origin/(.*)', defaultValue: 'origin/master', description: 'Please select the branch name to deploy', name: 'branchName', 
-      quickFilterEnabled: true, selectedValue: 'NONE', sortMode: 'NONE', tagFilter: '*', type: 'PT_BRANCH_TAG'),
+      quickFilterEnabled: true, selectedValue: 'NONE', sortMode: 'NONE', tagFilter: '*', type: 'PT_BRANCH_TAG')
           )])
   ])
 
