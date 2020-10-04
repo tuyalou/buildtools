@@ -1,4 +1,4 @@
-  def username = '' 
+  def username = ""
   def repositoryName = "${JOB_NAME}"
   def environment = ""
   def gitCommitHash = ""
@@ -77,7 +77,7 @@ def slavePodTemplate = """
               container("docker") {
                 sh "docker push ${env.username}/${repositoryName}:${gitCommitHash}"
                 if (params.PUSH_LATEST) {
-                  "docker push ${username}/${repositoryName}:${latest}"
+                  "docker push ${env.username}/${repositoryName}:${latest}"
                       }
               }
           }
