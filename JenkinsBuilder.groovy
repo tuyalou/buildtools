@@ -75,7 +75,7 @@ def slavePodTemplate = """
           }
           stage("Docker Push") {
               container("docker") {
-                sh "docker push ${username}/${repositoryName}:${gitCommitHash}"
+                sh "docker push ${env.username}/${repositoryName}:${gitCommitHash}"
                 if (params.PUSH_LATEST) {
                   "docker push ${username}/${repositoryName}:${latest}"
                       }
