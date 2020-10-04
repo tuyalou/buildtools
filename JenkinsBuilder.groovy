@@ -7,6 +7,7 @@ def repositoryName = "${JOB_NAME}"
 
 def registry = "tuyalou/${repositoryName}"
 def registryCredentials = 'docker-hub-creds'
+def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '').replace("/", "-").toLowerCase()
 
 def k8slabel = "jenkins-pipeline-${UUID.randomUUID().toString()}"
 def slavePodTemplate = """
