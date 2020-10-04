@@ -2,7 +2,7 @@
   def environment = ""
   def gitCommitHash = ""
   def dockerImage = ""
-  def repositoryName = "${JOB_NAME}
+  def repositoryName = "${JOB_NAME}"
   def imagename = "${username}/${repositoryName}"
   def registry = "${username}/${repositoryName}"
   def registryCredentials = 'docker-hub-creds'
