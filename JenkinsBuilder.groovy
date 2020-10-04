@@ -1,7 +1,9 @@
   def username = ""
-  def repositoryName = "${JOB_NAME}"
   def environment = ""
   def gitCommitHash = ""
+  def dockerImage = ""
+  def imagename = "${username}/${repositoryName}"
+  def repositoryName = "${JOB_NAME}"
   def registry = "${username}/${repositoryName}"
   def registryCredentials = 'docker-hub-creds'
 
@@ -65,7 +67,7 @@ def slavePodTemplate = """
         dir('Docker/') {
           stage("Docker Build") {
               container("docker") {
-                  dockerImage = docker.build(registry)
+                  dockerImage = docker.build imagename
               }
           }
           stage("Docker Login") {
