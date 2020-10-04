@@ -2,7 +2,7 @@ def username = ""
 def environment = ""
 def gitCommitHash = ""
 def dockerImage = ""
-
+def repositoryName = "${JOB_NAME}"
 
 def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '')
 if (branch =~ '^v[0-9].[0-9]' || branch =~ '^v[0-9][0-9].[0-9]' ) {
@@ -11,7 +11,6 @@ if (branch =~ '^v[0-9].[0-9]' || branch =~ '^v[0-9][0-9].[0-9]' ) {
       repositoryName = repositoryName + '-prod'
 }
 
-def repositoryName = "${JOB_NAME}"
 def registry = "tuyalou/${repositoryName}"
 def registryCredentials = 'docker-hub-creds'
 
