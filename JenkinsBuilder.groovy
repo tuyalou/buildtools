@@ -3,7 +3,7 @@
   def gitCommitHash = ""
   def dockerImage = ""
   def repositoryName = "${JOB_NAME}"
-  def imagename = "${username}/${repositoryName}"
+  def imagename = "tuyalou/${repositoryName}"
   def registry = "${username}/${repositoryName}"
   def registryCredentials = 'docker-hub-creds'
 
