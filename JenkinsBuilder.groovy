@@ -65,20 +65,16 @@ def slavePodTemplate = """
             gitCommitHash = sh(returnStdout: true, script: 'git rev-parse --short HEAD').trim()
         }
         dir('Docker/') {
-          stage("Docker Build") {
-              container("docker") {
-                  dockerImage = docker.build imagename
+          container("docker") {
+            withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: "docker-hub-creds", usernameVariable: 'username', passwordVariable: 'password']]) {
+              stage("Docker Build") {
+                dockerImage = docker.build imagename
               }
-          }
-          stage("Docker Login") {
-            container("docker") {
-              withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: "docker-hub-creds", usernameVariable: 'username', passwordVariable: 'password']]) {
+
+              stage("Docker Login") {
                 sh "docker login --username ${env.username} --password ${env.password}"
-                  }
               }
-          }
-          stage("Docker Push") {
-              container("docker") {
+              stage("Docker Push") {
                 docker.withRegistry( '', registryCredentials ) {
                   dockerImage.push("${gitCommitHash}")
                   if (params.PUSH_LATEST) {
@@ -90,3 +86,4 @@ def slavePodTemplate = """
           }
         }
       }
+    }
