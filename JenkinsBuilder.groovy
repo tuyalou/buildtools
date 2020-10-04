@@ -75,11 +75,10 @@ def slavePodTemplate = """
           }
           stage("Docker Push") {
               container("docker") {
-                  docker.withRegistry("${username}/${repositoryName}", 'docker-hub-creds') {
-                          dockerImage.push("${gitCommitHash}")
-                          if (params.PUSH_LATEST) {
-                                  dockerImage.push("latest")
-                          }
+                sh "docker push ${username}/${repositoryName}:${gitCommitHash}"
+                if (params.PUSH_LATEST) {
+                  "docker push ${username}/${repositoryName}:${latest}"
+                      }
               }
           }
         }
