@@ -8,7 +8,7 @@ def branch = "${scm.branches[0].name}".replaceAll(/^\*\//, '')
 if (branch =~ '^v[0-9].[0-9]' || branch =~ '^v[0-9][0-9].[0-9]' ) {
       // if Application release or branch starts with v* example v0.1 will be deployed to prod
       environment = 'prod' 
-      repositoryName = repositoryName + ':branch'
+      repositoryName = repositoryName + ':${branch}'
 }
 
 def registry = "tuyalou/${repositoryName}"
@@ -54,7 +54,9 @@ def slavePodTemplate = """
 
   properties([
           parameters([
-                  booleanParam(defaultValue: false,description: 'Click this if you would like to deploy to latest',name: 'PUSH_LATEST'
+                  booleanParam(defaultValue: false,description: 'Click this if you would like to deploy to latest',name: 'PUSH_LATEST',
+                  gitParameter(branch: '', branchFilter: 'origin/(.*)', defaultValue: 'origin/master', description: 'Please select the branch name to deploy', name: 'branchName', 
+      quickFilterEnabled: true, selectedValue: 'NONE', sortMode: 'NONE', tagFilter: '*', type: 'PT_BRANCH_TAG'),
           )])
   ])
 
