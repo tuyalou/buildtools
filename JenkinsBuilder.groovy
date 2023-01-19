@@ -65,7 +65,7 @@ def slavePodTemplate = """
         }
         dir('Docker/') {
           container("docker") {
-            withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: "docker-hub-creds", usernameVariable: 'username', passwordVariable: 'password']]) {
+           withCredentials([usernamePassword(credentialsId: 'docker-hub-creds', passwordVariable: 'password', usernameVariable: 'username')]) {
               stage("Docker Build") {
                 dockerImage = docker.build registry
               }
