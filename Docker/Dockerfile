@@ -3,21 +3,21 @@ FROM centos:7
 LABEL Fuchi Corp <fuchicorpsolution@gmail.com>
 
 ## Version of the Docker
-ENV DOCKERVERSION=18.03.1-ce
+ENV DOCKERVERSION=20.10.22
 
 ## Installing wget command
 RUN yum install wget -y && yum clean all
 
 ##Installing helm 
-RUN curl https://storage.googleapis.com/kubernetes-helm/helm-v2.14.0-linux-amd64.tar.gz > ./helm.tar.gz \
+RUN curl https://get.helm.sh/helm-v3.11.0-linux-amd64.tar.gz  > ./helm.tar.gz \
     && tar -xvf ./helm.tar.gz \
     && mv ./linux-amd64/*  /usr/local/bin
 
 ## Installing terraform
-RUN wget https://releases.hashicorp.com/terraform/0.11.14/terraform_0.11.14_linux_amd64.zip \
+RUN wget https://releases.hashicorp.com/terraform/1.3.0/terraform_1.3.0_linux_amd64.zip \
     && yum install unzip -y \
-    && unzip terraform_0.11.14_linux_amd64.zip \
-    && rm -rf  terraform_0.11.14_linux_amd64.zip \
+    && unzip terraform_1.3.0_linux_amd64.zip \
+    && rm -rf  terraform_1.3.0_linux_amd64.zip \
     && mv terraform /bin
 
 ## Download docker cli
