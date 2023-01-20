@@ -9,7 +9,7 @@ ENV DOCKERVERSION=20.10.22
 RUN yum install wget -y && yum clean all
 
 ##Installing helm 
-RUN curl https://get.helm.sh/helm-v3.11.0-linux-amd64.tar.gz  > ./helm.tar.gz \
+RUN curl https://get.helm.sh/helm-v2.14.1-linux-amd64.tar.gz  > ./helm.tar.gz \
     && tar -xvf ./helm.tar.gz \
     && mv ./linux-amd64/*  /usr/local/bin
 
